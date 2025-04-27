@@ -20,7 +20,7 @@ for file in files[:10]:
 
 
 
-file = input("Enter selection (as num) ")
+file = input("Enter selection (as num) should be a .pdf \n: ")
 
 
 output_folder = "outputs"
@@ -43,7 +43,7 @@ page_text = ""
 for page_num, page in enumerate(doc, start = 1):
     page_text += page.get_text()
 
-    if page_num % 5 == 0:
+    if page_num % 50 == 0:
         filename = os.path.join(output_folder, f"output_{i}.txt")
         with open(filename, "w") as f:
             f.write(page_text)
