@@ -13,7 +13,7 @@ namespace NQueensProb
         {
             Console.WriteLine("N-Queens: place N queens on an NxN board so none attack each other.");
 
-            Console.Write("What size board anything over 12 will probably fail its recursive (: : ");
+            Console.Write("What size board anything over 12 will probably fail its recursive : ");
             int N = int.Parse(Console.ReadLine());
 
             int[,] board = new int[N, N]; 
