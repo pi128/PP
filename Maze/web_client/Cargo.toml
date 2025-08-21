@@ -1,0 +1,8 @@
+[package]
+name = "web_client"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+path_core = { path = "../path_core" }
+macroquad = "0.4"

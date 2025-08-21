@@ -1,0 +1,3 @@
+[workspace]
+members = ["path_core", "web_client"]
+resolver = "2"
