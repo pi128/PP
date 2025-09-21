@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Make A Ocean</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    html, body { height: 100%; margin: 0; background: #0a99c9; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    /* Canvas fills the page */
+    #wrap { position: relative; height: 100%; width: 100%; }
+    #canvas { display: block; width: 100%; height: 100%; border: 0; background: transparent; touch-action: none; }
+
+    /* In-canvas control panel (top-left), sits ABOVE the canvas */
+    .panel {
+      position: absolute; left: 12px; top: 12px;
+      display: inline-flex; gap: 8px; align-items: center;
+      background: rgba(255,255,255,0.85);
+      border-radius: 10px; padding: 8px 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+      z-index: 10;
+      user-select: none;
+    }
+    .panel h1 { margin: 0 10px 0 0; font-size: 16px; font-weight: 600; }
+    .panel button {
+      border: 1px solid #cdd;
+      background: #f6f7f8;
+      padding: 6px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font: inherit;
+    }
+    .panel button:hover { background: #eef1f4; }
+  </style>
+</head>
+<body>
+  <div id="wrap">
+    <!-- overlayed UI; this area matches the Go no-draw zone -->
+    <div class="panel">
+      <h1>Make A Ocean</h1>
+      <button onclick="clearCanvas()">Clear</button>
+      <button onclick="savePNG()">Save</button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="wasm_exec.js"></script>
+  <script>
+    const WASM_URL = "main.wasm?v=40"; // bump after rebuilds
+    const go = new Go();
+
+    (async () => {
+      try {
+        const res = await WebAssembly.instantiateStreaming(fetch(WASM_URL), go.importObject);
+        await go.run(res.instance);
+      } catch (e) {
+        const resp = await fetch(WASM_URL);
+        const bytes = await resp.arrayBuffer();
+        const res2 = await WebAssembly.instantiate(bytes, go.importObject);
+        await go.run(res2.instance);
+      }
+    })();
+
+    function savePNG() {
+      const c = document.getElementById('canvas');
+      const a = document.createElement('a');
+      a.href = c.toDataURL('image/png');
+      a.download = 'ocean.png';
+      a.click();
+    }
+  </script>
+</body>
+</html>
