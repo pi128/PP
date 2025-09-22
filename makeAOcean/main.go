@@ -11,23 +11,12 @@ import (
 	"syscall/js"
 )
 
-/*
-Behavior:
-- Ocean palette
-- Big emojis / fewer cells (chunky look)
-- Hover-stamp overwrite: entering a cell always paints a new random emoji
-- High-rate input: pointerrawupdate + pointermove + mousemove
-- Canvas stretches to fill the viewport (no gutters)
-- Seam-free background repaint per tile (device-pixel snapped)
-- No-draw UI zone in top-left for overlay buttons
-*/
-
 const (
 	rows = 24
 	cols = 36
 	tile = 64
 
-	// No-draw zone under the in-canvas UI (set to 0 to disable)
+	// no drawing zone under the in-canvas UI (set to 0 to disable)
 	uiW = 9 * tile
 	uiH = 3 * tile
 )
@@ -39,10 +28,9 @@ var (
 	// One emoji per cell ("" = water)
 	cells [rows][cols]string
 
-	// Fast RNG seeded once from crypto/rand
+	// fully cryupto
 	rng *rand.Rand
 
-	// 🌊 Ocean palette (deduped)
 	emojis = []string{
 		"🌊", "💧", "🫧", "🌧️",
 		"🐟", "🐠", "🐡", "🐬", "🐳", "🐋", "🦈",
@@ -52,11 +40,11 @@ var (
 		"🏝️", "🏖️", "🦭", "🏄‍♂️",
 	}
 
-	// Logical drawing size (before scaling)
+	// Logical drawing size
 	logicalW = cols * tile
 	logicalH = rows * tile
 
-	// Current transform (device pixels)
+	// Current transform
 	dpr    = 1.0
 	scaleX = 1.0
 	scaleY = 1.0
@@ -67,11 +55,8 @@ var (
 	prevR = -1
 	prevC = -1
 
-	// Keep handlers alive (avoid GC)
 	resizeFn, rawMoveFn, pointerMoveFn, mouseMoveFn, pointerLeaveFn, mouseLeaveFn js.Func
 )
-
-/* ---------- utils ---------- */
 
 func seedRNG() {
 	var b [8]byte
@@ -90,8 +75,6 @@ func clamp(v, lo, hi int) int {
 	}
 	return v
 }
-
-/* ---------- drawing ---------- */
 
 func setCanvasState() {
 	size := tile * 92 / 100 // ~92% to keep glyphs off the very edge
@@ -150,11 +133,11 @@ func paintDot(r, c int) {
 	if r < 0 || r >= rows || c < 0 || c >= cols {
 		return
 	}
-	cells[r][c] = randEmoji() // overwrite every time we enter
+	cells[r][c] = randEmoji()
 	drawCell(r, c)
 }
 
-/* ---------- layout: fill viewport (stretch X & Y) ---------- */
+// layout of screen
 
 func layout() {
 	win := js.Global()
@@ -191,8 +174,6 @@ func layout() {
 	setCanvasState()
 }
 
-/* ---------- mapping ---------- */
-
 func mapEventToPos(ev js.Value) (lx, ly float64, r, c int) {
 	b := canvas.Call("getBoundingClientRect")
 	devX := (ev.Get("clientX").Float() - b.Get("left").Float()) * dpr
@@ -219,18 +200,18 @@ func mapEventToPos(ev js.Value) (lx, ly float64, r, c int) {
 	return
 }
 
-/* ---------- hover-stamp (overwrite) ---------- */
+// hover stamp instead of tails
 
 func handleMove(ev js.Value) {
 	lx, ly, r, c := mapEventToPos(ev)
 
-	// No-draw zone for in-canvas UI (top-left)
+	// locking top left
 	if lx < float64(uiW) && ly < float64(uiH) {
 		prevR, prevC = -1, -1
 		return
 	}
 
-	// Same cell → do nothing
+	// Same cell do nothing
 	if r == prevR && c == prevC {
 		return
 	}
@@ -247,8 +228,6 @@ func onMove(this js.Value, args []js.Value) any {
 }
 func onLeave(this js.Value, _ []js.Value) any { prevR, prevC = -1, -1; return nil }
 
-/* ---------- JS-callable ---------- */
-
 func clearCanvas(this js.Value, _ []js.Value) any {
 	for r := 0; r < rows; r++ {
 		for c := 0; c < cols; c++ {
@@ -258,8 +237,6 @@ func clearCanvas(this js.Value, _ []js.Value) any {
 	redrawAll()
 	return nil
 }
-
-/* ---------- main ---------- */
 
 func main() {
 	seedRNG()
@@ -274,7 +251,7 @@ func main() {
 	// export Clear (Save is handled in HTML via toDataURL)
 	js.Global().Set("clearCanvas", js.FuncOf(clearCanvas))
 
-	// keep handlers alive & bind high-rate events
+	// keep handlers alive
 	resizeFn = js.FuncOf(func(js.Value, []js.Value) any { layout(); redrawAll(); return nil })
 	rawMoveFn = js.FuncOf(onMove)
 	pointerMoveFn = js.FuncOf(onMove)
