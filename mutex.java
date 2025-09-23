@@ -16,7 +16,7 @@ class Counter {
     }
 }
 
-public class op {
+public class mutex {
     public static void main(String[] args) {
         Counter counter = new Counter();
 
