@@ -3,6 +3,15 @@ Make the button nicer
 add some sound 
 
 Sonar game with movement 
+beautiful idea it should be all dark and light up by sonar and your a 2d sub the movement shuld be smooth and use dx dy to have a bit of sliding
+try to make more of the game loop and graphic updates on the java script side then call back to the go wasm program to handle game state
+
+
+you are a sub that is patrolling around in the dark and there are schools of fish. You press a button to send out a sonar beam or maybe a lidar scan 
+
+leave the boids out youre a sub that has a point projection feature and youre trying to go around to get stuff and like slender man eventually once you get all N you win 
+
+is the map just a generated maze or is it pregenerated objects, what if there is a surface wgere the top level changes color to be bright
 
 mine game with fog of war using emojis and the same cursor stuff
 
