@@ -1,0 +1,13 @@
+A safe learning path (hands-on)
+	1.	Randomness: write a tiny wrapper that reads from the OS CSPRNG. (If you want to learn internals, implement HMAC-DRBG seeded by the OS.)
+	2.	AES (educational): implement AES-128 ECB for learning only (easiest to test), then add a real mode:
+	•	For real use, jump straight to AES-GCM from a library (gives confidentiality + integrity).
+	3.	RSA (educational): write a toy RSA with Miller–Rabin primes and then practice OAEP and PSS (again: learning only).
+	4.	Hybrid flow:
+	•	Generate random 256-bit session key.
+	•	Encrypt message with AES-GCM(session key, nonce) → ciphertext + tag.
+	•	Encrypt session key with RSA-OAEP(recipient public key).
+	•	(Optional but recommended) Sign the plaintext (or ciphertext, depending on design) with RSA-PSS / Ed25519.
+	5.	Format: bundle { encrypted_session_key, nonce, ciphertext, tag, signature, metadata }.
+
+    
