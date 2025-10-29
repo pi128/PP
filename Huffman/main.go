@@ -12,8 +12,6 @@ type Tree[T cmp.Ordered] struct {
 	value  T
 }
 
-// Inserts v into the BST rooted at t and returns the node that holds v.
-// Works even if t is nil, as long as the caller assigns the return to root.
 func (t *Tree[T]) addChild(v T) *Tree[T] {
 	if t == nil {
 		return &Tree[T]{value: v}
