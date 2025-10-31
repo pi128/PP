@@ -1,7 +1,7 @@
 
 
 #include <stdio.h>
-
+#include <string.h>
 
 int main(void) {
 
@@ -13,12 +13,16 @@ int main(void) {
     return 1;
         }
 
-    char ch;
-
+    identifier = [a-zA-Z_]\w*\b
+    char *words[]
+    
+    
+    
     while ((ch = getc(fptr)) != EOF) {
         if (ch == ' '){
             continue;
         }
+        
         else {
             printf("%c", ch);
         }
