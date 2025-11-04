@@ -1,5 +1,7 @@
 """ 
+
    To run this script on your Arduino:
+    to find the device ls /dev/cu.*   
     source venv/bin/activate
     mpremote connect /dev/cu.usbmodem101 cp blink.py :
     mpremote connect /dev/cu.usbmodem101 exec 'import blink'
