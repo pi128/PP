@@ -1,0 +1,76 @@
+BLUETOOTH SERIAL COMMUNICATION GUIDE
+====================================
+
+UPLOAD TO ARDUINO:
+-----------------
+source venv/bin/activate
+mpremote connect /dev/cu.usbmodem101 cp bluetooth_serial.py :
+
+RUN ON ARDUINO:
+--------------
+mpremote connect /dev/cu.usbmodem101 exec "import bluetooth_serial"
+
+The Arduino will start advertising as "Arduino" via Bluetooth.
+
+
+CONNECT FROM YOUR PHONE:
+------------------------
+1. Download a BLE UART app:
+   - iOS: "LightBlue" or "nRF Connect"
+   - Android: "Serial Bluetooth Terminal" or "nRF Connect"
+
+2. Scan for Bluetooth devices
+3. Connect to device named "Arduino"
+4. Look for the UART service (UUID: 6E400001...)
+5. Send text commands
+
+COMMANDS YOU CAN TRY:
+--------------------
+- "hello" - Arduino responds with greeting
+- "blink" - Blinks the LED 3 times
+- Any other text - Arduino echoes it back
+
+
+CONNECT FROM YOUR MAC:
+----------------------
+Using Python with bleak library:
+
+pip install bleak
+
+Then use this script to connect from your Mac:
+
+import asyncio
+from bleak import BleakClient, BleakScanner
+
+UART_RX_UUID = "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
+UART_TX_UUID = "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
+
+async def main():
+    devices = await BleakScanner.discover()
+    arduino = None
+    for d in devices:
+        if d.name == "Arduino":
+            arduino = d
+            break
+    
+    if arduino:
+        async with BleakClient(arduino) as client:
+            print(f"Connected to {arduino.name}")
+            
+            def notification_handler(sender, data):
+                print(f"Received: {data.decode()}")
+            
+            await client.start_notify(UART_TX_UUID, notification_handler)
+            await client.write_gatt_char(UART_RX_UUID, b"hello\n")
+            await asyncio.sleep(2)
+
+asyncio.run(main())
+
+
+TROUBLESHOOTING:
+---------------
+- If you can't find "Arduino" device, restart the script on Arduino
+- Make sure Bluetooth is enabled on your phone/computer
+- The Arduino must be running the bluetooth_serial.py script
+- Press Ctrl+C to stop the script on Arduino
+
