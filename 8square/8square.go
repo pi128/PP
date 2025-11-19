@@ -112,6 +112,7 @@ func randomize() []int {
 		list[i], list[j] = list[j], list[i]
 
 	}
+
 	return list
 }
 
